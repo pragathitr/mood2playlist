@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { fetchRecommendations } from './api'
+import { fetchAgenticPlaylist } from "./api";
 
 const MOODS = ["hype","cozy","focus","sad-girl","romantic","study","rage-run","party","dark"]
 
@@ -36,6 +37,32 @@ export default function App() {
   const [variant, setVariant] = useState(0)           // NEW
   const [clicks, setClicks] = useState(0)             // NEW
   const refreshEveryTwo = true                        // toggle behavior here
+  const [agentMood, setAgentMood] = useState("cozy");
+  const [agentSeed, setAgentSeed] = useState(42);
+  const [agentVariant, setAgentVariant] = useState(0);
+  const [agentData, setAgentData] = useState(null);
+  const [agentLoading, setAgentLoading] = useState(false);
+  const [agentError, setAgentError] = useState("");
+
+
+  async function handleAgentRun() {
+    setAgentLoading(true);
+    setAgentError("");
+    setAgentData(null);
+    try {
+      const data = await fetchAgenticPlaylist({
+        mood: agentMood,
+        limit: 10,
+        seed: Number(agentSeed) || 42,
+        variant: Number(agentVariant) || 0,
+      });
+      setAgentData(data);
+    } catch (e) {
+      setAgentError(String(e?.message || e));
+    } finally {
+      setAgentLoading(false);
+   }
+  }
 
   async function go() {
     setLoading(true); setError('')
@@ -100,6 +127,102 @@ export default function App() {
       {!tracks.length && (
         <div className="mt-10 text-neutral-500">No tracks yet — pick a mood and hit Generate.</div>
       )}
+
+      {/* Agent Mode (Multi-Agent, Traced) */}
+<div className="mt-8 rounded-xl border border-neutral-700/40 p-4">
+  <h3 className="text-lg font-semibold">Agent Mode (2026-ready)</h3>
+
+  <div className="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-3">
+    <div>
+      <label className="block text-sm opacity-80 mb-1">Mood</label>
+      <input
+        className="w-full rounded-md border border-neutral-700/50 bg-transparent px-3 py-2"
+        value={agentMood}
+        onChange={(e) => setAgentMood(e.target.value)}
+        placeholder="cozy"
+      />
     </div>
+
+    <div>
+      <label className="block text-sm opacity-80 mb-1">Seed</label>
+      <input
+        type="number"
+        className="w-full rounded-md border border-neutral-700/50 bg-transparent px-3 py-2"
+        value={agentSeed}
+        onChange={(e) => setAgentSeed(e.target.value)}
+      />
+    </div>
+
+    <div>
+      <label className="block text-sm opacity-80 mb-1">Variant</label>
+      <input
+        type="number"
+        className="w-full rounded-md border border-neutral-700/50 bg-transparent px-3 py-2"
+        value={agentVariant}
+        onChange={(e) => setAgentVariant(e.target.value)}
+      />
+    </div>
+
+    <div className="flex items-end">
+      <button
+        onClick={handleAgentRun}
+        className="w-full rounded-md bg-indigo-600 hover:bg-indigo-500 px-4 py-2 font-medium"
+      >
+        Try Agent Mode
+      </button>
+    </div>
+  </div>
+
+  {agentLoading && <p className="mt-3 text-sm opacity-80">Generating…</p>}
+  {agentError && <p className="mt-3 text-sm text-red-400">{agentError}</p>}
+
+  {agentData && (
+    <div className="mt-4">
+      <p className="text-sm opacity-75">
+        mood <span className="font-mono">{agentData.mood}</span> •
+        seed <span className="font-mono">{agentData.seed}</span> •
+        size <span className="font-mono">{agentData.count}</span> •
+        dup_rate <span className="font-mono">{Number(agentData?.metrics?.dup_rate ?? 0).toFixed(2)}</span> •
+        unique_artists <span className="font-mono">{agentData?.metrics?.unique_artists}</span>
+      </p>
+      <a
+        href={`http://localhost:8000${agentData.trace_url}`}
+        target="_blank"
+        rel="noreferrer"
+        className="text-xs underline opacity-70"
+      >
+        view trace
+      </a>
+
+      <ul className="mt-3 space-y-2">
+        {agentData.playlist.map((t, i) => (
+          <li key={i} className="flex items-center gap-3">
+            {t.image ? (
+              <img src={t.image} alt="" className="w-12 h-12 rounded-md object-cover" />
+            ) : (
+              <div className="w-12 h-12 rounded-md bg-neutral-800" />
+            )}
+            <div>
+              <a
+                href={t.spotify_url || "#"}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+              >
+                {i + 1}. {t.artist} — {t.title}
+              </a>
+              {t.genre && (
+                <div className="text-xs opacity-60">genre: {t.genre}</div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+    </div>
+
   )
 }
