@@ -1,0 +1,8 @@
+seed: 42
+playlist_size: 10
+budgets:
+  curator_max_calls: 8
+  critic_max_calls: 3
+  compliance_max_calls: 3
+timeouts_ms:
+  tool: 800
