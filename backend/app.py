@@ -8,11 +8,17 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
-
-from mood_map import MOOD_PRESETS
+from fastapi import FastAPI
+#from backend.spotify_client import spotify_get, shutdown_http  # NEW shared client
+from backend.mood_map import MOOD_PRESETS
+#from mood_map import MOOD_PRESETS
+from pathlib import Path
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 # --- env ---
 load_dotenv()
+load_dotenv(dotenv_path=Path(__file__).parent / ".env", override=False)
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 if not CLIENT_ID or not CLIENT_SECRET:
@@ -32,6 +38,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount(
+    "/traces",
+    StaticFiles(directory="agentic_playlist/traces"),
+    name="traces",
+)
+# --- Agent Mode routes ---
+from backend.routers.agentic import router as agentic_router
+app.include_router(agentic_router, prefix="/api/agentic", tags=["agentic"])
+
 
 # --- models ---
 class Track(BaseModel):
