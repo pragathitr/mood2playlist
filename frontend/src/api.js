@@ -14,3 +14,13 @@ export async function fetchRecommendations(mood, limit = 12, variant = 0) {
   }
   return res.json();
 }
+// Agent Mode: fetch multi-agent playlist
+export async function fetchAgenticPlaylist({ mood, limit = 10, seed = 42, variant = 0 }) {
+  const params = new URLSearchParams({ mood, limit, seed, variant });
+  const res = await fetch(`/api/agentic/recommend?${params.toString()}`);
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Agentic API failed: ${res.status} ${txt}`);
+  }
+  return await res.json();
+}
