@@ -116,7 +116,7 @@ LEX = {
     "sad": {"words": {"heartbreak","alone","cry","melancholy","nostalgic","blue", "sad"}, "genres": ["indie","indie-pop","singer-songwriter","alt-rock","pop"]},
     "romantic": {"words": {"date","romantic","kiss","slow","candlelight","valentine", "love"}, "genres": ["r-n-b","soul","latin","pop","indie-pop"]},
     "dark": {"words": {"noir","brooding","night","storm","industrial"}, "genres": ["industrial","electro","rock","trap","alt-rock"]},
-    "rage": {"words": {"rage","sprint","angry","metal","mosh", "rock", "hard rock"}, "genres": ["rock","metal","trap","alt-rock","edm"]},
+    "rage": {"words": {"rage","sprint","angry","angry gym","metal","mosh", "rock", "hard rock"}, "genres": ["rock","metal","trap","alt-rock","edm"]},
 }
 
 DEFAULT_GENRES = ["pop","indie","singer-songwriter","chill"]

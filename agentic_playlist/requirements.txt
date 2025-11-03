@@ -1,0 +1,7 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+pydantic==2.9.2
+python-dotenv==1.0.1
+rich==13.8.0
+# Optional: If you already use Spotify client libs elsewhere, you can remove this.
+spotipy==2.23.0
